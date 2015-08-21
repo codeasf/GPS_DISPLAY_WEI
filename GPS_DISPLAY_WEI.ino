@@ -1,6 +1,8 @@
+#include <TinyGPS++.h>
 #include "U8glib.h"
 
 U8GLIB_ST7920_128X64_4X u8g(7);    // SPI Com: SCK = en = 13, MOSI = rw = 11, CS = di = 7
+TinyGPSPlus gps;
 
 void draw(void) {
   // graphic commands to redraw the complete screen should be placed here  
