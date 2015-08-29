@@ -9,77 +9,51 @@ U8GLIB_ST7920_128X64_4X u8g(10);    // SPI Com: SCK = en = 13, MOSI = WR = 11, C
 TinyGPSPlus gps;
 
 float topSpeed = 0 , spd = 0;
-boolean GPSSignal = false;
+char buff[15];
 
 void setup() {
-  Serial.begin(GPSBaud);
-  Serial.write(GPScommand, 14);
+	Serial.begin(GPSBaud);
+	Serial.write(GPScommand, 14);
 }
 
 void loop() {
   //GPS DISPLAY
-  while (Serial.available() > 0) {
-    if (gps.encode(Serial.read())) {
-      GPSSignal = true;
-      //if ((gps.speed.kmph() - spd) < 100){   //up to 100KM/H ??
-      if (gps.course.isValid()) {
-        spd = gps.speed.kmph();
-        if (spd > topSpeed)
-          topSpeed = spd;
+	while (Serial.available() > 0) {
+		if ( gps.encode( Serial.read() ) ) {
+			if ((gps.speed.kmph() - spd) < 100){   //up to 100KM/H ??
+		  		spd = gps.speed.kmph();
+		  		if (spd > topSpeed)
+		  			topSpeed = spd;
 
-      }
-      else {
-        GPSSignal = false;
-      }
-    }
+		  	}
+		}
+
+	}
 
     // picture loop
     u8g.firstPage();
     do {
-      draw();
+    	draw();
     } while ( u8g.nextPage() );
-  }
+
 }
 
 
 void draw() {
-  if (GPSSignal) {
     // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    u8g.drawStr( 0, 10, F2String(topSpeed));
 
+    u8g.setFont(u8g_font_unifont);
+    int i, dec;
+	i = (int)topSpeed;
+	dec = (topSpeed - i) * 100;
+	sprintf(buff, "TOP:%d.%02d KM/H", i, dec);
+	u8g.drawStr( 0, 10, buff);
 
     u8g.setFont(u8g_font_fub49n);
-    u8g.drawStr( 6, 63, I2String(spd));
-  }
-  else {
-    u8g.setFont(u8g_font_unifont);
-    u8g.drawStr( 0, 10, "NO GPS SINGAL");
-
-    u8g.setFont(u8g_font_fub49n);
-    u8g.drawStr( 6, 63, "0");
-  }
-}
-
-//void noSignalDraw() {
-//  u8g.setFont(u8g_font_unifont);
-//  u8g.drawStr( 0, 10, "NO GPS SINGAL");
-//
-//  u8g.setFont(u8g_font_fub49n);
-//  u8g.drawStr( 6, 63, "0");
-//}
-
-char* F2String(float sp) {
-  int i, dec;
-  char _buff[15];
-  i = sp;
-  dec = (sp - (int)sp) * 100;
-  sprintf(_buff, "TOP:%s.%sKM/H", i, dec);
-  return _buff;
-}
-
-char* I2String(float sp) {
-  char _buff [15];
-  sprintf(_buff, "%d", sp);
-  return _buff;
+	int iSpd = (int)spd;
+	sprintf(buff, "%d", iSpd);
+    byte x = 0;
+    byte w = u8g.getStrWidth(buff) / 2;
+    x = 63 - w;
+    u8g.drawStr( x, 63, buff);
 }
