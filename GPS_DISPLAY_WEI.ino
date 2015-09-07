@@ -66,12 +66,14 @@ void draw() {
 	sprintf(buff, "TOP:%d.%02d KM/H", i, dec);
 	u8g.drawStr( 0, 10, buff);
 
+/*
     // 显示处理时间
 	sprintf(buff, "%d", lenTime);
 	u8g.drawStr( 0, 63, buff);
     sprintf(buff, "%d", longTime);
     byte x = u8g.getStrWidth(buff);
     u8g.drawStr(127-x, 63, buff);
+*/
 
     u8g.setFont(u8g_font_fub49n);
 	int iSpd = (int)spd;
